@@ -170,6 +170,7 @@ public class RecyclerViewFragment extends Fragment {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            //enable versioning of request to override older searches in TP implementation
             new FetchAsync().execute(queryText, Integer.toString(mSearchCounter.incrementAndGet()));
 
         }
