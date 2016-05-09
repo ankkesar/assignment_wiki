@@ -58,13 +58,11 @@ public class RecyclerViewFragment extends Fragment {
         rootView.setTag(TAG);
         mSearchCounter = new AtomicInteger();
         mSearchHandler = new SearchHandler();
-        // BEGIN_INCLUDE(initializeRecyclerView)
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
 
         mLayoutManager = new LinearLayoutManager(getActivity());
 
         mRecyclerView.setLayoutManager(mLayoutManager);
-//        queryText=
         searchEt = (EditText) rootView.findViewById(R.id.search_et);
         searchEt.addTextChangedListener(new TextWatcher() {
             @Override
@@ -80,7 +78,6 @@ public class RecyclerViewFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable editable) {
                 queryText = editable.toString().trim().toLowerCase();
-//                new FetchAsync().execute(queryText,Integer.toString(mSearchCounter.incrementAndGet()));
                 if (!prev.equals(queryText)) {
                     if (!TextUtils.isEmpty(queryText)) {
                         mSearchHandler.removeMessages(1);
@@ -101,17 +98,12 @@ public class RecyclerViewFragment extends Fragment {
 
         @Override
         protected ArrayList<UserSearch> doInBackground(String... query) {
-//        InputStream ins = getResources().openRawResource(
-//                getResources().getIdentifier("f_one",
-//                        "raw", voids[0].getPackageName()));
             searchUrl = SEARCH_URL +query[0];
                                 try {
                 if (Integer.parseInt(query[1]) == mSearchCounter.get())
                     return grabContent(searchUrl);
                 else
                     return null;
-//            UserSearch obj = mapper.readValue(new URL("https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=thumbnail&pithumbsize=50&pilimit=50&generator=prefixsearch&gpssearch=man"), UserSearch.class);
-//            System.out.println("jackson"+obj);
             } catch (IOException e) {
                 e.printStackTrace();
                 return null;
@@ -132,7 +124,7 @@ public class RecyclerViewFragment extends Fragment {
             }
         }
     }
-
+// initiate request
     private ArrayList<UserSearch> grabContent(String searchUrl) throws IOException {
 
         // Connect to the URL using java's native library
@@ -144,6 +136,7 @@ public class RecyclerViewFragment extends Fragment {
         JsonParser jp = new JsonParser();
         JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
         ArrayList<UserSearch> imageList = null;
+        if (root.getAsJsonObject()!=null){
         if (root.getAsJsonObject().getAsJsonObject("query") != null) {
             JsonObject sourceObj = root.getAsJsonObject().getAsJsonObject("query").getAsJsonObject("pages");
             System.out.println("RESPONSE:" + sourceObj.toString());
@@ -168,9 +161,10 @@ public class RecyclerViewFragment extends Fragment {
                 }
             }
         }
+        }
         return imageList;
     }
-
+//Accumulates request for 600ms to avoid frequent changes
     class SearchHandler extends android.os.Handler {
 
         @Override
